@@ -1,4 +1,4 @@
-var userData = [{ text: 'xxxxxxxx', username: 'AussieSox'}, { text: 'zzzzzzz', username: 'BobbySox' }];
+var userData = [{ text: 'xxxxxxxx', username: 'Alice'}, { text: 'zzzzzzz', username: 'Bobby' }];
 
 var requestHandler = function(request, response) {
   var path = require('path');
@@ -11,20 +11,23 @@ var requestHandler = function(request, response) {
   var url = request.url;
   var headers = request.headers;
   var body = [];
-  var endPoints = { '/classes/messages': true, '/classes/room': true };
+  var endPoints = { '/classes/messages/': true, '/classes/room/': true, '/': true };
 
-  var defaultCorsHeaders = {
+  var defaultHeaders = {
     'access-control-allow-origin': '*',
     'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'access-control-allow-headers': 'content-type, accept',
-    'access-control-max-age': 10 // Seconds.
+    'access-control-max-age': 10 // in seconds
   };
 
-  console.log('Serving request type ' + request.method + ' for url ' + request.url + 'in request handler');
+  console.log('Serving request type ' + request.method + ' for url ' + request.url);
   
-  var headers = defaultCorsHeaders;
+  var headers = defaultHeaders;
   headers['Content-Type'] = 'application/JSON';
-
+ if( method === 'OPTIONS') {
+  response.writeHead(201, defaultHeaders);
+  response.end();
+ }
   if ( method === 'POST' && endPoints[endPoint] ) {
     request.on('data', function(chunk) {
       body.push(chunk);
@@ -32,6 +35,7 @@ var requestHandler = function(request, response) {
     .on('end', function() {
       body = Buffer.concat(body).toString();
       var parsed = JSON.parse(body);
+      parsed['objectId'] = shortid.generate();
       userData.unshift(parsed);
       response.writeHead(201, headers);
       response.end(JSON.stringify({results: userData}));
