@@ -24,10 +24,10 @@ var requestHandler = function(request, response) {
   
   var headers = defaultHeaders;
   headers['Content-Type'] = 'application/JSON';
- if( method === 'OPTIONS') {
-  response.writeHead(201, defaultHeaders);
-  response.end();
- }
+  if( method === 'OPTIONS') {
+    response.writeHead(201, defaultHeaders);
+    response.end();
+  }
   if ( method === 'POST' && endPoints[endPoint] ) {
     request.on('data', function(chunk) {
       body.push(chunk);
