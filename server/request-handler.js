@@ -1,73 +1,77 @@
-/*************************************************************
-
-You should implement your request handler function in this file.
-
-requestHandler is already getting passed to http.createServer()
-in basic-server.js, but it won't work as is.
-
-You'll have to figure out a way to export this function from
-this file and include it in basic-server.js so that it actually works.
-
-*Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
-
-**************************************************************/
 
 var requestHandler = function(request, response) {
-  // Request and Response come from node's http module.
-  //
-  // They include information about both the incoming request, such as
-  // headers and URL, and about the outgoing response, such as its status
-  // and content.
-  //
-  // Documentation for both request and response can be found in the HTTP section at
-  // http://nodejs.org/documentation/api/
+  var userData = [
+    {
+      //createdAt: '2016-10-03T23:22:38.747Z',
+      //objectId: 'qpcIw5cVHH',
+      ///roomname: 'lobby',
+      text: 'xxxxxxxx',
+     // updatedAt: '2016-10-03T23:22:38.747Z',
+      username: 'AussieSox'
+    },
+    {
+      //createdAt: '2016-10-03T18:16:52.235Z',
+      //objectId: 'RLnHnguqwE',
+      //roomname: 'lobby',
+      text: 'zzzzzzz',
+      //updatedAt: '2016-10-03T18:16:52.235Z',
+      username: 'BobbySox'
+    }
+  ];
 
-  // Do some basic logging.
-  //
-  // Adding more logging to your server can be an easy way to get passive
-  // debugging help, but you should always be careful about leaving stray
-  // console.logs in your code.
-  console.log('Serving request type ' + request.method + ' for url ' + request.url);
+  var path = require('path');
+  var url = require('url');
+  var shortid = require('shortid');
 
-  // The outgoing status.
-  var statusCode = 200;
 
-  // See the note below about CORS headers.
+  var parsedUrl = url.parse(request.url);
+  // var endPoint = parsedUrl.pathname === '/' ? '/index.html' : parsedUrl.pathname;
+  var endPoint = parsedUrl.pathname;
+
+  var method = request.method;
+  var url = request.url;
+  var headers = request.headers;
+  var body = [];
+
+  var defaultCorsHeaders = {
+    'access-control-allow-origin': '*',
+    'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'access-control-allow-headers': 'content-type, accept',
+    'access-control-max-age': 10 // Seconds.
+  };
+
+  console.log('Serving request type ' + request.method + ' for url ' + request.url + 'in request handler');
+  
   var headers = defaultCorsHeaders;
+  headers['Content-Type'] = 'application/JSON';
 
-  // Tell the client we are sending them plain text.
-  //
-  // You will need to change this if you are sending something
-  // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'text/plain';
 
-  // .writeHead() writes to the request line and headers of the response,
-  // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
+ 
 
-  // Make sure to always call response.end() - Node may not send
-  // anything back to the client until you do. The string you pass to
-  // response.end() will be the body of the response - i.e. what shows
-  // up in the browser.
-  //
-  // Calling .end "flushes" the response's internal buffer, forcing
-  // node to actually send all the data over to the client.
-  response.end('Hello, World!');
+  request.on('error', function(err) {
+    console.error(err.stack);
+  });
+
+
+  if (method === 'POST' && endPoint === '/classes/messages') {
+    request.on('data', function(chunk) {
+      body.push(chunk);
+    })
+    .on('end', function() {
+      body = Buffer.concat(body).toString();
+      var parsed = JSON.parse(body);
+      userData.unshift(parsed);
+      response.writeHead(201, headers);
+      response.end(JSON.stringify({results: userData}));
+    });
+  } 
+  if (method === 'GET') {
+    response.writeHead( 200, headers );
+    response.end(JSON.stringify({results: userData}));
+  }
 };
 
-// These headers will allow Cross-Origin Resource Sharing (CORS).
-// This code allows this server to talk to websites that
-// are on different domains, for instance, your chat client.
-//
-// Your chat client is running from a url like file://your/chat/client/index.html,
-// which is considered a different domain.
-//
-// Another way to get around this restriction is to serve you chat
-// client from this domain by setting up static file serving.
-var defaultCorsHeaders = {
-  'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept',
-  'access-control-max-age': 10 // Seconds.
-};
+
+var exports = module.exports = {};
+module.exports.requestHandler = requestHandler;
 
