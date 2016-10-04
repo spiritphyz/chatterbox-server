@@ -71,7 +71,9 @@ describe('Node Server Request Listener Function', function() {
 
     // Testing for a newline isn't a valid test
     // TODO: Replace with with a valid test
-    // expect(res._data).to.equal(JSON.stringify('\n'));
+    expect(res._data).to.equal(JSON.stringify([ { username: 'Jono', message: 'Do my bidding!' },
+  { text: 'xxxxxxxx', username: 'AussieSox' },
+  { text: 'zzzzzzz', username: 'BobbySox' } ]));
     expect(res._ended).to.equal(true);
   });
 
@@ -84,7 +86,6 @@ describe('Node Server Request Listener Function', function() {
     var res = new stubs.response();
 
     handler.requestHandler(req, res);
-
     expect(res._responseCode).to.equal(201);
 
       // Now if we request the log for that room the message we posted should be there:

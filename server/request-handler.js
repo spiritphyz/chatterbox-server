@@ -1,37 +1,17 @@
+var userData = [{ text: 'xxxxxxxx', username: 'AussieSox'}, { text: 'zzzzzzz', username: 'BobbySox' }];
 
 var requestHandler = function(request, response) {
-  var userData = [
-    {
-      //createdAt: '2016-10-03T23:22:38.747Z',
-      //objectId: 'qpcIw5cVHH',
-      ///roomname: 'lobby',
-      text: 'xxxxxxxx',
-     // updatedAt: '2016-10-03T23:22:38.747Z',
-      username: 'AussieSox'
-    },
-    {
-      //createdAt: '2016-10-03T18:16:52.235Z',
-      //objectId: 'RLnHnguqwE',
-      //roomname: 'lobby',
-      text: 'zzzzzzz',
-      //updatedAt: '2016-10-03T18:16:52.235Z',
-      username: 'BobbySox'
-    }
-  ];
-
   var path = require('path');
   var url = require('url');
   var shortid = require('shortid');
-
-
   var parsedUrl = url.parse(request.url);
   // var endPoint = parsedUrl.pathname === '/' ? '/index.html' : parsedUrl.pathname;
   var endPoint = parsedUrl.pathname;
-
   var method = request.method;
   var url = request.url;
   var headers = request.headers;
   var body = [];
+  var endPoints = { '/classes/messages': true, '/classes/room': true };
 
   var defaultCorsHeaders = {
     'access-control-allow-origin': '*',
@@ -45,15 +25,7 @@ var requestHandler = function(request, response) {
   var headers = defaultCorsHeaders;
   headers['Content-Type'] = 'application/JSON';
 
-
- 
-
-  request.on('error', function(err) {
-    console.error(err.stack);
-  });
-
-
-  if (method === 'POST' && endPoint === '/classes/messages') {
+  if ( method === 'POST' && endPoints[endPoint] ) {
     request.on('data', function(chunk) {
       body.push(chunk);
     })
@@ -64,14 +36,22 @@ var requestHandler = function(request, response) {
       response.writeHead(201, headers);
       response.end(JSON.stringify({results: userData}));
     });
-  } 
-  if (method === 'GET') {
+  }
+
+  if ( method === 'GET' && endPoints[endPoint] ) {
     response.writeHead( 200, headers );
     response.end(JSON.stringify({results: userData}));
   }
-};
 
+  if ( !endPoints[endPoint] ) {
+    response.writeHead(404, headers);
+    response.end();
+  }
+  
+  request.on('error', function(err) {
+    console.error(err.stack);
+  });
+};
 
 var exports = module.exports = {};
 module.exports.requestHandler = requestHandler;
-
