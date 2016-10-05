@@ -1,4 +1,25 @@
-var userData = [{ text: 'xxxxxxxx', username: 'Alice'}, { text: 'zzzzzzz', username: 'Bobby' }];
+var fs = require('fs');
+var userData = [];
+
+fs.readFile('./dataStore.txt', 'utf8', function (err, data) {
+  // userData = data;
+  userData = JSON.parse(data.toString());
+  // console.log('after file has been read, data is: ', data);
+  console.log('after file has been read, data is: ', userData);
+  // console.log('typeof', typeof data);
+  console.log('typeof', typeof userData);
+  if (err) {
+    return console.log(err);
+  }
+});
+
+var writeDataToDisk = function(data) {
+  fs.writeFile('dataStore.txt', data, function(err) {
+    if (err) {
+      return console.log('file write error: ', err);
+    }
+  });
+};
 
 var requestHandler = function(request, response) {
   var path = require('path');
@@ -17,14 +38,14 @@ var requestHandler = function(request, response) {
     'access-control-allow-origin': '*',
     'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'access-control-allow-headers': 'content-type, accept',
+    'Content-Type': 'application/JSON',
     'access-control-max-age': 10 // in seconds
   };
 
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
   
   var headers = defaultHeaders;
-  headers['Content-Type'] = 'application/JSON';
-  if( method === 'OPTIONS') {
+  if ( method === 'OPTIONS') {
     response.writeHead(201, defaultHeaders);
     response.end();
   }
@@ -37,6 +58,7 @@ var requestHandler = function(request, response) {
       var parsed = JSON.parse(body);
       parsed['objectId'] = shortid.generate();
       userData.unshift(parsed);
+      writeDataToDisk(JSON.stringify(userData));
       response.writeHead(201, headers);
       response.end(JSON.stringify({results: userData}));
     });
@@ -57,5 +79,7 @@ var requestHandler = function(request, response) {
   });
 };
 
+
 var exports = module.exports = {};
 module.exports.requestHandler = requestHandler;
+
