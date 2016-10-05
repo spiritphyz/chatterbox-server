@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>Chatterbox</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <!-- dependencies -->
+    <!-- your scripts -->
+    <script>
+    // YOU DO NOT NEED TO EDIT THIS CODE
+    if (!/(&|\?)username=/.test(window.location.search)) {
+        var newSearch = window.location.search;
+        if (newSearch !== '' & newSearch !== '?') {
+            newSearch += '&';
+        }
+        newSearch += 'username=' + (prompt('What is your name?') || 'anonymous');
+        window.location.search = newSearch;
+
+    }
+    </script>
+</head>
+
+<body>
+    <div class="main">
+        <h1>Chatterbox</h1>
+        <br>
+        <div class="rooms" data-rooms="lobby">
+            <form action="#" id="roomform" method="" autocomplete="off">
+                <span class="room"> Room:
+              <select id="roomSelect">
+                <option value="lobby"> Lobby </option>
+              </select>
+            </span>
+                <input type="text" name="room" class="roomField" />
+                <button class="createRoom">Create Room</button>
+            </form>
+        </div>
+        <form action="#" id="send" method="post" autocomplete="off">
+            <input type="text" name="message" class="message" />
+        </form>
+        <button class="submit">Send</button>
+        <button class="refresh">Refresh</button>
+        <button class="clear">Clear</button>
+        <br>
+        <br>
+        <div class="chats"></div>
+    </div>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/moment/moment.js"></script>
+    <script src="env/config.js"></script>
+    <script src="scripts/app.js"></script>
+</body>
+
+</html>
