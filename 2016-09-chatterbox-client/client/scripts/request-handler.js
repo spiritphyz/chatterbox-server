@@ -32,23 +32,28 @@ var requestHandler = function(request, response) {
   var url = request.url;
   var headers = request.headers;
   var body = [];
-  var endPoints = { '/classes/messages/': true, '/classes/room/': true, '/': true };
+  var endPoints = { 
+    '/classes/messages/': '/classes/messages/', 
+    '/classes/room/': '/classes/room/', 
+    '/': '/'
+  };
   var defaultHeaders = { 'access-control-allow-origin': '*', 
     'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'access-control-allow-headers': 'content-type, accept',
     'Content-Type': 'application/JSON',
     'access-control-max-age': 10 // in seconds
   };
+  webPageHeaders = defaultHeaders;
+  webPageHeaders['Content-Type'] = 'text/html';
   if ( method === 'GET' && endPoints[endPoint] === '/' ) {
+  // if ( method === 'GET' ) {
     fs.readFile('../index.html', function(err, data) {
       if (err) { console.log(err); }
-      response.writeHead(201, defaultHeaders);
+      response.writeHead(201, webPageHeaders);
       response.write(data);
       response.end();
     });
   }
-
-  
 
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
   
@@ -72,7 +77,7 @@ var requestHandler = function(request, response) {
     });
   }
 
-  if ( method === 'GET' && endPoints[endPoint] === '/classes/messages/') {
+  if ( method === 'GET' && endPoints[endPoint] === '/classes/messages/' ) {
     response.writeHead( 200, headers );
     response.end(JSON.stringify({results: userData}));
   }
